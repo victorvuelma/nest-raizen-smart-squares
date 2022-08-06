@@ -6,6 +6,8 @@ import {
 
 import { AppModule } from './app.module';
 
+import 'core-js/es/reflect';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
