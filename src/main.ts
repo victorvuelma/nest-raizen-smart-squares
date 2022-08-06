@@ -14,8 +14,6 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   const host = process.env.HOST ?? '0.0.0.0';
 
-  await app.listen(port, host);
-
   // Starts listening for shutdown hooks
   app.enableShutdownHooks();
 
