@@ -6,8 +6,6 @@ export class CustomerModel {
 
   @AutoMap()
   email: string;
-  @AutoMap()
-  password: string;
 
   @AutoMap()
   cpf: string;
@@ -22,7 +20,6 @@ export class CustomerModel {
   constructor(
     id: string,
     email: string,
-    password: string,
     cpf: string,
     name: string,
     phone: string,
@@ -30,7 +27,6 @@ export class CustomerModel {
   ) {
     this.id = id;
     this.email = email;
-    this.password = password;
     this.cpf = cpf;
     this.name = name;
     this.phone = phone;

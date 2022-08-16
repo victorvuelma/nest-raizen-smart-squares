@@ -6,7 +6,7 @@ import { PrismaService } from '../../../common/infra/database/prisma.service';
 export class CustomerRepository {
   constructor(private prisma: PrismaService) {}
 
-  async customer(
+  async get(
     customerWhereUniqueInput: Prisma.CustomerWhereUniqueInput,
   ): Promise<Customer | null> {
     return this.prisma.customer.findUnique({
@@ -14,7 +14,7 @@ export class CustomerRepository {
     });
   }
 
-  async customers(params: {
+  async find(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.CustomerWhereUniqueInput;
@@ -31,13 +31,13 @@ export class CustomerRepository {
     });
   }
 
-  async createCustomer(data: Prisma.CustomerCreateInput): Promise<Customer> {
+  async create(data: Prisma.CustomerCreateInput): Promise<Customer> {
     return this.prisma.customer.create({
       data,
     });
   }
 
-  async updateCustomer(params: {
+  async update(params: {
     where: Prisma.CustomerWhereUniqueInput;
     data: Prisma.CustomerUpdateInput;
   }): Promise<Customer> {
@@ -48,9 +48,7 @@ export class CustomerRepository {
     });
   }
 
-  async deleteCustomer(
-    where: Prisma.CustomerWhereUniqueInput,
-  ): Promise<Customer> {
+  async delete(where: Prisma.CustomerWhereUniqueInput): Promise<Customer> {
     return this.prisma.customer.delete({
       where,
     });
