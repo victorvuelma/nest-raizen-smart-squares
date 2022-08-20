@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 const _apiConfigScheme = z.object({
+  BCRYPT_ROUNDS: z
+    .string()
+    .default('4')
+    .transform((expires) => Number(expires)),
   DATABASE_URL: z.string().url(),
   HOST: z.string().default('0.0.0.0'),
   JWT_EXPIRES: z

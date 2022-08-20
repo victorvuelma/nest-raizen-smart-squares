@@ -5,6 +5,10 @@ import { ConfigService } from '@nestjs/config';
 export class ApiConfigService {
   constructor(private _configService: ConfigService) {}
 
+  get bcryptRounds(): number {
+    return this._configService.getOrThrow<number>('BCRYPT_ROUNDS');
+  }
+
   get databaseUrl(): string {
     return this._configService.getOrThrow<string>('DATABASE_URL');
   }

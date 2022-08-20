@@ -96,7 +96,7 @@ model Offer {
   id              String            @id   @db.Uuid()  @default(uuid())
   name            String
   description     String
-  imageUrl        String?
+  imageUrl        String
   cost            Int
   partner         Partner           @relation(fields: [partnerId], references: [id])
   partnerId       String            @db.Uuid()

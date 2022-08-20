@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
+import { ApiConfigService } from '../api-config/api-config.service';
+
 @Injectable()
 export class BcryptService {
+  constructor(private _apiConfig: ApiConfigService) {}
+
   async hash(password: string): Promise<string> {
-    const hash = await bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(password, this._apiConfig.bcryptRounds);
 
     return hash;
   }
