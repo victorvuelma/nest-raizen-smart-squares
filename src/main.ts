@@ -1,5 +1,6 @@
 import 'core-js/es/reflect';
 
+import fastifyHelmet from '@fastify/helmet';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -18,17 +19,18 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  const prisma = app.get(PrismaService);
-
   app.setGlobalPrefix('v1');
   app.useGlobalFilters(new HttpExceptionFilter(), new ZodExceptionFilter());
 
+  await app.getHttpAdapter().getInstance().register(fastifyHelmet);
+
   // Starts listening for shutdown hooks
   app.enableShutdownHooks();
+
+  const prisma = app.get(PrismaService);
   await prisma.enableShutdownHooks(app);
 
   const apiConfig = app.get(ApiConfigService);
-
   await app.listen(apiConfig.port, apiConfig.host);
 }
 bootstrap();

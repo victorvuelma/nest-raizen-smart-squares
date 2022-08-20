@@ -17,6 +17,9 @@ export class CustomerModel {
   @AutoMap()
   birthDate: Date;
 
+  @AutoMap()
+  points: number;
+
   constructor(
     id: string,
     email: string,
@@ -24,6 +27,7 @@ export class CustomerModel {
     name: string,
     phone: string,
     birthDate: Date,
+    points: number,
   ) {
     this.id = id;
     this.email = email;
@@ -31,5 +35,6 @@ export class CustomerModel {
     this.name = name;
     this.phone = phone;
     this.birthDate = birthDate;
+    this.points = points;
   }
 }
