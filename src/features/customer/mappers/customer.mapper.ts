@@ -1,6 +1,5 @@
 import { createMap } from '@automapper/core';
 import { Injectable } from '@nestjs/common';
-import { Customer } from '@prisma/client';
 
 import { MapperService } from '../../../common/infra/mapper/mapper.service';
 import { CustomerModel } from '../models/customer.model';

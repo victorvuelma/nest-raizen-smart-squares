@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Customer, Prisma } from '@prisma/client';
+
 import { PrismaService } from '../../../common/infra/database/prisma.service';
 
 @Injectable()
 export class CustomerRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private _prisma: PrismaService) {}
 
   async get(
     customerWhereUniqueInput: Prisma.CustomerWhereUniqueInput,
   ): Promise<Customer | null> {
-    return this.prisma.customer.findUnique({
+    return this._prisma.customer.findUnique({
       where: customerWhereUniqueInput,
     });
   }
@@ -22,7 +23,7 @@ export class CustomerRepository {
     orderBy?: Prisma.CustomerOrderByWithRelationInput;
   }): Promise<Customer[]> {
     const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.customer.findMany({
+    return this._prisma.customer.findMany({
       skip,
       take,
       cursor,
@@ -32,7 +33,7 @@ export class CustomerRepository {
   }
 
   async create(data: Prisma.CustomerCreateInput): Promise<Customer> {
-    return this.prisma.customer.create({
+    return this._prisma.customer.create({
       data,
     });
   }
@@ -42,14 +43,14 @@ export class CustomerRepository {
     data: Prisma.CustomerUpdateInput;
   }): Promise<Customer> {
     const { where, data } = params;
-    return this.prisma.customer.update({
+    return this._prisma.customer.update({
       data,
       where,
     });
   }
 
   async delete(where: Prisma.CustomerWhereUniqueInput): Promise<Customer> {
-    return this.prisma.customer.delete({
+    return this._prisma.customer.delete({
       where,
     });
   }

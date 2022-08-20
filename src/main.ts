@@ -1,10 +1,10 @@
+import 'core-js/es/reflect';
+
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-
-import 'core-js/es/reflect';
 
 import { AppModule } from './app.module';
 import { PrismaService } from './common/infra/database/prisma.service';
@@ -22,7 +22,7 @@ async function bootstrap() {
   const prisma = app.get(PrismaService);
 
   app.setGlobalPrefix('v1');
-  app.useGlobalFilters(new ZodExceptionFilter(), new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(), new ZodExceptionFilter());
 
   // Starts listening for shutdown hooks
   app.enableShutdownHooks();

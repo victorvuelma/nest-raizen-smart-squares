@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Customer } from '@prisma/client';
-import { BcryptService } from '../../../common/infra/crypt/bcrypt.service';
-import { CustomerMapper } from '../mappers/customer.mapper';
-import { CreateCustomerModel } from '../models/create-customer.model';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
+import { BcryptService } from '../../../common/infra/crypt/bcrypt.service';
+import { AuthenticateCustomerDto } from '../dtos/authenticate-customer.dto';
+import { CreateCustomerDto } from '../dtos/create-customer.dto';
+import { CustomerMapper } from '../mappers/customer.mapper';
 import { CustomerModel } from '../models/customer.model';
 import { CustomerRepository } from '../repository/customer.repository';
 import { CustomerValidator } from '../validators/customer.validator';
@@ -17,17 +17,47 @@ export class CustomerService {
     private _customerValidator: CustomerValidator,
   ) {}
 
-  async create(
-    craeteCustomer: Partial<CreateCustomerModel>,
+  async auth(
+    authenticate: Partial<AuthenticateCustomerDto>,
   ): Promise<CustomerModel> {
-    const validatedCustomer = this._customerValidator.validate(craeteCustomer);
+    const authenticateCustomer =
+      this._customerValidator.validateAuthenticateCustomer(authenticate);
+
+    const customer = await this._customerRepository.get({
+      email: authenticateCustomer.email,
+    });
+    if (!customer) {
+      throw new UnauthorizedException('Invalid username or password provided');
+    }
+
+    const customerPassword = customer.password;
+    const passwordMatches = await this._bcryptService.compare(
+      authenticateCustomer.password,
+      customerPassword,
+    );
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Invalid username or password provided');
+    }
+
+    const customerModel = this._customerMapper.mapper.map(
+      customer,
+      CustomerModel,
+      CustomerModel,
+    );
+
+    return customerModel;
+  }
+
+  async create(create: Partial<CreateCustomerDto>): Promise<CustomerModel> {
+    const createCustomer =
+      this._customerValidator.validateCreateCustomer(create);
 
     const hashedPassword = await this._bcryptService.hash(
-      validatedCustomer.password,
+      createCustomer.password,
     );
-    validatedCustomer.password = hashedPassword;
+    createCustomer.password = hashedPassword;
 
-    const customer = await this._customerRepository.create(validatedCustomer);
+    const customer = await this._customerRepository.create(createCustomer);
     const customerModel = this._customerMapper.mapper.map(
       customer,
       CustomerModel,

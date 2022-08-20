@@ -3,12 +3,12 @@ import { z } from 'zod';
 
 import { cpfRefineValidator } from '../../../common/utils/validators/cpf-refine.validator';
 import { dateValidRefineValidator } from '../../../common/utils/validators/date-valid.validator';
-
-import { CreateCustomerModel } from '../models/create-customer.model';
+import { AuthenticateCustomerDto } from '../dtos/authenticate-customer.dto';
+import { CreateCustomerDto } from '../dtos/create-customer.dto';
 
 @Injectable()
 export class CustomerValidator {
-  customerScheme = z.object({
+  private _createCustomerScheme = z.object({
     name: z.string().min(1),
     email: z.string().email(),
     password: z.string().min(6),
@@ -20,8 +20,23 @@ export class CustomerValidator {
     phone: z.string().nullable(),
   });
 
-  validate(customer: Partial<CreateCustomerModel>): CreateCustomerModel {
-    const parsedCustomer = this.customerScheme.parse(customer);
+  private _authenticateCustomerScheme = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+  });
+
+  validateCreateCustomer(
+    createCustomer: Partial<CreateCustomerDto>,
+  ): CreateCustomerDto {
+    const parsedCustomer = this._createCustomerScheme.parse(createCustomer);
+
+    return parsedCustomer;
+  }
+  validateAuthenticateCustomer(
+    authenticateCustomer: Partial<AuthenticateCustomerDto>,
+  ): AuthenticateCustomerDto {
+    const parsedCustomer =
+      this._authenticateCustomerScheme.parse(authenticateCustomer);
 
     return parsedCustomer;
   }

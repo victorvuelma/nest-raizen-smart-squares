@@ -1,6 +1,6 @@
 import { AutoMap } from '@automapper/classes';
 
-export class CreateCustomerModel {
+export class CreateCustomerDto {
   @AutoMap()
   email: string;
   @AutoMap()
