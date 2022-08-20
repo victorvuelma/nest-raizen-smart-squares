@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Gender } from '@prisma/client';
 import { z } from 'zod';
 
 import { cpfRefineValidator } from '../../../common/utils/validators/cpf-refine.validator';
@@ -18,6 +19,7 @@ export class CustomerValidator {
       .refine(dateValidRefineValidator, 'Invalid value')
       .transform((v) => new Date(v)),
     phone: z.string().nullable(),
+    gender: z.nativeEnum(Gender),
   });
 
   private _authenticateCustomerScheme = z.object({

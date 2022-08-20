@@ -16,10 +16,10 @@ model Customer {
   cpf       String   @unique
   name      String
   phone     String?
-  birthDate DateTime
+  birthDate DateTime @db.Date
   password  String   
-  gender      Gender    @default(UNKNOWN)
-  active    Boolean   @default(true)
+  gender    Gender   @default(UNKNOWN)
+  active    Boolean  @default(true)
 }
 
 enum Gender {
