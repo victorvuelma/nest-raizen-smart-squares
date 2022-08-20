@@ -8,7 +8,10 @@ const _apiConfigScheme = z.object({
     .default('3600')
     .transform((expires) => Number(expires)),
   JWT_SECRET: z.string(),
-  PORT: z.number().default(3000),
+  PORT: z
+    .string()
+    .default('3000')
+    .transform((expires) => Number(expires)),
 });
 
 export type ApiConfigEnvironment = z.infer<typeof _apiConfigScheme>;
