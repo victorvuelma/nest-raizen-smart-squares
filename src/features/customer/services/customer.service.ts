@@ -42,7 +42,6 @@ export class CustomerService {
     const customerModel = this._customerMapper.mapper.map(
       customer,
       CustomerModel,
-      CustomerModel,
     );
 
     return customerModel;
@@ -60,7 +59,6 @@ export class CustomerService {
     const customer = await this._customerRepository.create(createCustomer);
     const customerModel = this._customerMapper.mapper.map(
       customer,
-      CustomerModel,
       CustomerModel,
     );
 

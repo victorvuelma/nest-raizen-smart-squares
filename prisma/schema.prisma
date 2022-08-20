@@ -61,7 +61,7 @@ model Session {
   id              String            @id   @db.Uuid()  @default(uuid())
   startAt         DateTime          @default(now())
   endAt           DateTime?
-  points          Int               @unique
+  points          Int               
   bicycle         Bicycle           @relation(fields: [bicycleId], references: [id])
   bicycleId       String            @db.Uuid()
   customer        Customer          @relation(fields: [customerId], references: [id])
@@ -74,7 +74,7 @@ model Session {
 model Activity {
   id              String            @id   @db.Uuid()  @default(uuid())
   when            DateTime          @default(now())
-  points          Int               @unique
+  points          Int               
   session         Session           @relation(fields: [sessionId], references: [id])
   sessionId       String            @db.Uuid()
   createdAt       DateTime          @default(now())
