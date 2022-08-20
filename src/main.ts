@@ -7,6 +7,7 @@ import {
 } from '@nestjs/platform-fastify';
 
 import { AppModule } from './app.module';
+import { ApiConfigService } from './common/infra/api-config/api-config.service';
 import { PrismaService } from './common/infra/database/prisma.service';
 import { HttpExceptionFilter } from './common/infra/http/filters/http-exception.filter';
 import { ZodExceptionFilter } from './common/infra/http/filters/zod-exception.filter';
@@ -16,8 +17,6 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  const port = process.env.PORT ?? 3000;
-  const host = process.env.HOST ?? '0.0.0.0';
 
   const prisma = app.get(PrismaService);
 
@@ -28,6 +27,8 @@ async function bootstrap() {
   app.enableShutdownHooks();
   await prisma.enableShutdownHooks(app);
 
-  await app.listen(port, host);
+  const apiConfig = app.get(ApiConfigService);
+
+  await app.listen(apiConfig.port, apiConfig.host);
 }
 bootstrap();

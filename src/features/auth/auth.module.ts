@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
+import { CommonModule } from '../../common/common.module';
+import { ApiConfigService } from '../../common/infra/api-config/api-config.service';
 import { CustomerModule } from '../customer/customer.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './service/auth.service';
@@ -11,16 +12,16 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
-    ConfigModule,
+    CommonModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+      imports: [CommonModule],
+      useFactory: async (apiConfig: ApiConfigService) => ({
+        secret: apiConfig.jwtSecret,
         signOptions: {
-          expiresIn: configService.get<number>('JWT_EXPIRES'),
+          expiresIn: apiConfig.jwtExpires,
         },
       }),
-      inject: [ConfigService],
+      inject: [ApiConfigService],
     }),
     PassportModule,
     CustomerModule,
