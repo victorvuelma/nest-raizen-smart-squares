@@ -13,6 +13,12 @@ export class ApiConfigService {
     return this._configService.getOrThrow<string>('DATABASE_URL');
   }
 
+  get environment(): 'PRODUCTION' | 'DEVELOPMENT' {
+    return this._configService.getOrThrow<'PRODUCTION' | 'DEVELOPMENT'>(
+      'ENVIRONMENT',
+    );
+  }
+
   get host(): string {
     return this._configService.getOrThrow<string>('HOST');
   }

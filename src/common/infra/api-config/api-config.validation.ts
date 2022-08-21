@@ -6,6 +6,7 @@ const _apiConfigScheme = z.object({
     .default('4')
     .transform((rounds) => Number(rounds)),
   DATABASE_URL: z.string().url(),
+  ENVIRONMENT: z.enum(['PRODUCTION', 'DEVELOPMENT']).default('DEVELOPMENT'),
   HOST: z.string().default('0.0.0.0'),
   JWT_EXPIRES: z
     .string()

@@ -18,6 +18,7 @@ enum Gender {
   UNKNOWN
 }
 
+
 model Customer {
   id              String            @id   @db.Uuid()  @default(uuid())
   email           String            @unique
@@ -35,6 +36,7 @@ model Customer {
   updatedAt       DateTime          @updatedAt
 }
 
+
 model Place {
   id              String            @id   @db.Uuid()  @default(uuid())
   name            String
@@ -44,6 +46,7 @@ model Place {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
+
 
 model Bicycle {
   id              String            @id   @db.Uuid()  @default(uuid())
@@ -57,11 +60,20 @@ model Bicycle {
   updatedAt       DateTime          @updatedAt
 }
 
+
+enum SessionStatus {
+  STARTING
+  RUNNING
+  ENDING
+  CLOSED
+}
+
 model Session {
   id              String            @id   @db.Uuid()  @default(uuid())
   startAt         DateTime          @default(now())
   endAt           DateTime?
-  points          Int               
+  points          Int               @default(0)
+  status          SessionStatus     @default(STARTING)
   bicycle         Bicycle           @relation(fields: [bicycleId], references: [id])
   bicycleId       String            @db.Uuid()
   customer        Customer          @relation(fields: [customerId], references: [id])
