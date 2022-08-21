@@ -1,15 +1,24 @@
-export class AuthJwtPayload {
+export class AuthenticatedUser {
   sub: string;
+
+  customerId: string;
 
   username: string;
   email: string;
 
   name: string;
 
-  constructor(sub: string, username: string, name: string, email: string) {
+  constructor(
+    sub: string,
+    customerId: string,
+    username: string,
+    email: string,
+    name: string,
+  ) {
     this.sub = sub;
+    this.customerId = customerId;
     this.username = username;
-    this.name = name;
     this.email = email;
+    this.name = name;
   }
 }

@@ -16,6 +16,6 @@ import { CustomerValidator } from './validators/customer.validator';
     CustomerService,
     CustomerValidator,
   ],
-  exports: [CustomerService],
+  exports: [CustomerService, CustomerRepository],
 })
 export class CustomerModule {}

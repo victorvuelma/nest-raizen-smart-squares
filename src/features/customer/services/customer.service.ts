@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import { BcryptService } from '../../../common/infra/crypt/bcrypt.service';
 import { AuthenticateCustomerDto } from '../dtos/authenticate-customer.dto';
@@ -16,6 +20,22 @@ export class CustomerService {
     private _customerRepository: CustomerRepository,
     private _customerValidator: CustomerValidator,
   ) {}
+
+  async get(customerId: string): Promise<CustomerModel> {
+    const customer = await this._customerRepository.get({
+      id: customerId,
+    });
+    if (!customer) {
+      throw new BadRequestException('Customer not found');
+    }
+
+    const customerModel = this._customerMapper.mapper.map(
+      customer,
+      CustomerModel,
+    );
+
+    return customerModel;
+  }
 
   async auth(
     authenticate: Partial<AuthenticateCustomerDto>,

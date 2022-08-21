@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Partner, Prisma } from '@prisma/client';
+import { Partner, Prisma, PrismaPromise } from '@prisma/client';
 
 import { PrismaService } from '../../../common/infra/database/prisma.service';
 
@@ -7,21 +7,21 @@ import { PrismaService } from '../../../common/infra/database/prisma.service';
 export class PartnerRepository {
   constructor(private _prisma: PrismaService) {}
 
-  async get(
+  get(
     PartnerWhereUniqueInput: Prisma.PartnerWhereUniqueInput,
-  ): Promise<Partner | null> {
+  ): PrismaPromise<Partner | null> {
     return this._prisma.partner.findUnique({
       where: PartnerWhereUniqueInput,
     });
   }
 
-  async find(params: {
+  find(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.PartnerWhereUniqueInput;
     where?: Prisma.PartnerWhereInput;
     orderBy?: Prisma.PartnerOrderByWithRelationInput;
-  }): Promise<Partner[]> {
+  }): PrismaPromise<Partner[]> {
     const { skip, take, cursor, where, orderBy } = params;
     return this._prisma.partner.findMany({
       skip,
@@ -32,16 +32,16 @@ export class PartnerRepository {
     });
   }
 
-  async create(data: Prisma.PartnerCreateInput): Promise<Partner> {
+  create(data: Prisma.PartnerCreateInput): PrismaPromise<Partner> {
     return this._prisma.partner.create({
       data,
     });
   }
 
-  async update(params: {
+  update(params: {
     where: Prisma.PartnerWhereUniqueInput;
     data: Prisma.PartnerUpdateInput;
-  }): Promise<Partner> {
+  }): PrismaPromise<Partner> {
     const { where, data } = params;
     return this._prisma.partner.update({
       data,
@@ -49,7 +49,7 @@ export class PartnerRepository {
     });
   }
 
-  async delete(where: Prisma.PartnerWhereUniqueInput): Promise<Partner> {
+  delete(where: Prisma.PartnerWhereUniqueInput): PrismaPromise<Partner> {
     return this._prisma.partner.delete({
       where,
     });

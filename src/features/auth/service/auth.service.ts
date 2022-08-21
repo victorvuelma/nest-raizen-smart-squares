@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { CustomerModel } from '../../customer/models/customer.model';
 import { CustomerService } from '../../customer/services/customer.service';
-import { AuthJwtPayload } from '../dto/jwt-payload.dto';
+import { AuthenticatedUser } from '../dto/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,11 +25,12 @@ export class AuthService {
   }
 
   async login(customer: CustomerModel) {
-    const payload: AuthJwtPayload = {
+    const payload: AuthenticatedUser = {
+      sub: customer.id,
+      customerId: customer.id,
       username: customer.email,
       name: customer.name,
       email: customer.email,
-      sub: customer.id,
     };
 
     return {
