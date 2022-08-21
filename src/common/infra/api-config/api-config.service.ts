@@ -25,6 +25,30 @@ export class ApiConfigService {
     return this._configService.getOrThrow<string>('JWT_SECRET');
   }
 
+  get mqttHostname(): string {
+    return this._configService.getOrThrow<string>('MQTT_HOST');
+  }
+
+  get mqttPassword(): string {
+    return this._configService.getOrThrow<string>('MQTT_PASSWORD');
+  }
+
+  get mqttProtocol(): 'ssl' {
+    return this._configService.getOrThrow<'ssl'>('MQTT_PROTOCOL');
+  }
+
+  get mqttProtocolVersion(): number {
+    return this._configService.getOrThrow<number>('MQTT_PROTOCOL_VERSION');
+  }
+
+  get mqttPort(): number {
+    return this._configService.getOrThrow<number>('MQTT_PORT');
+  }
+
+  get mqttUser(): string {
+    return this._configService.getOrThrow<string>('MQTT_USER');
+  }
+
   get port(): number {
     return this._configService.getOrThrow<number>('PORT');
   }

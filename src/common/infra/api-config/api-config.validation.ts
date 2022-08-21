@@ -12,6 +12,12 @@ const _apiConfigScheme = z.object({
     .default('3600')
     .transform((expires) => Number(expires)),
   JWT_SECRET: z.string(),
+  MQTT_PORT: z.string().transform((port) => Number(port)),
+  MQTT_HOST: z.string(),
+  MQTT_PASSWORD: z.string(),
+  MQTT_PROTOCOL: z.enum(['ssl']),
+  MQTT_PROTOCOL_VERSION: z.string().transform((version) => Number(version)),
+  MQTT_USER: z.string(),
   PORT: z
     .string()
     .default('3000')

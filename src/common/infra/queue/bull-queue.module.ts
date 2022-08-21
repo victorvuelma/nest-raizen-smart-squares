@@ -8,6 +8,7 @@ import { ApiConfigService } from '../api-config/api-config.service';
   imports: [
     BullModule.forRootAsync({
       imports: [CommonModule],
+      inject: [ApiConfigService],
       useFactory: async (apiConfig: ApiConfigService) => ({
         prefix: 'ss_',
         redis: {
@@ -16,12 +17,8 @@ import { ApiConfigService } from '../api-config/api-config.service';
           password: apiConfig.redisPassword,
         },
       }),
-      inject: [ApiConfigService],
-    }),
-    BullModule.registerQueue({
-      name: 'activation',
     }),
   ],
   exports: [BullModule],
 })
-export class QueueModule {}
+export class BullQueueModule {}

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
+import { MqttBrokerModule } from './common/infra/broker/mqtt-broker.module';
+import { BullQueueModule } from './common/infra/queue/bull-queue.module';
 import { ActivationModule } from './features/activation/activation.module';
 import { AuthModule } from './features/auth/auth.module';
 import { CustomerModule } from './features/customer/customer.module';
@@ -17,9 +17,9 @@ import { PartnerModule } from './features/partner/partner.module';
     CustomerModule,
     OfferModule,
     PartnerModule,
+    BullQueueModule,
+    MqttBrokerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
   exports: [CommonModule, CustomerModule, OfferModule],
 })
 export class AppModule {}
