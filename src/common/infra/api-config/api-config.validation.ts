@@ -4,7 +4,7 @@ const _apiConfigScheme = z.object({
   BCRYPT_ROUNDS: z
     .string()
     .default('4')
-    .transform((expires) => Number(expires)),
+    .transform((rounds) => Number(rounds)),
   DATABASE_URL: z.string().url(),
   HOST: z.string().default('0.0.0.0'),
   JWT_EXPIRES: z
@@ -15,7 +15,10 @@ const _apiConfigScheme = z.object({
   PORT: z
     .string()
     .default('3000')
-    .transform((expires) => Number(expires)),
+    .transform((port) => Number(port)),
+  REDIS_PORT: z.string().transform((port) => Number(port)),
+  REDIS_HOST: z.string(),
+  REDIS_PASSWORD: z.string(),
 });
 
 export type ApiConfigEnvironment = z.infer<typeof _apiConfigScheme>;

@@ -28,4 +28,16 @@ export class ApiConfigService {
   get port(): number {
     return this._configService.getOrThrow<number>('PORT');
   }
+
+  get redisHost(): string {
+    return this._configService.getOrThrow<string>('REDIS_HOST');
+  }
+
+  get redisPassword(): string {
+    return this._configService.getOrThrow<string>('REDIS_PASSWORD');
+  }
+
+  get redisPort(): number {
+    return this._configService.getOrThrow<number>('REDIS_PORT');
+  }
 }
