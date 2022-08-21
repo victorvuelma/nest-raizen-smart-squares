@@ -39,8 +39,6 @@ export class ActivationRepository {
   create(
     data: Prisma.ActivationCreateInput,
   ): PrismaPromise<ActivationWithOffer> {
-    console.log(data);
-
     return this._prisma.activation.create({
       data,
       include: {

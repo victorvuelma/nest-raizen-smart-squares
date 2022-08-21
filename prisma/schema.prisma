@@ -110,10 +110,13 @@ model Offer {
 model Activation {
   id              String            @id   @db.Uuid()  @default(uuid())
   when            DateTime          @default(now())
+  code            String            
   offer           Offer             @relation(fields: [offerId], references: [id])
   offerId         String            @db.Uuid()
   customer        Customer          @relation(fields: [customerId], references: [id])
   customerId      String            @db.Uuid()
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@unique([offerId, code], name: "activation_offer_code_unique")
 }

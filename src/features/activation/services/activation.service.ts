@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { v4 as uuidV4 } from 'uuid';
 
 import { PrismaService } from '../../../common/infra/database/prisma.service';
 import { CustomerRepository } from '../../customer/repository/customer.repository';
@@ -37,9 +38,12 @@ export class ActivationService {
       );
     }
 
+    const code = uuidV4().substring(0, 8).toUpperCase();
+
     const createActivation = this._activationRepository.create({
       offer: { connect: { id: activateOffer.offerId } },
       customer: { connect: { id: customer.id } },
+      code: code,
     });
     const decreaseCustomerPoints = this._customerRepository.update({
       where: { id: customer.id },
