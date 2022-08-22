@@ -29,6 +29,8 @@
     "@automapper/core": "^8.7.5",
     "@automapper/nestjs": "^8.7.5",
     "@brazilian-utils/brazilian-utils": "^1.0.0-rc.12",
+    "@bull-board/api": "^4.2.2",
+    "@bull-board/fastify": "^4.2.2",
     "@fastify/helmet": "^9.1.0",
     "@nestjs/bull": "^0.6.1",
     "@nestjs/common": "^9.0.11",

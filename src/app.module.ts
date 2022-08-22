@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { CommonModule } from './common/common.module';
-import { MqttBrokerModule } from './common/infra/broker/mqtt-broker.module';
-import { BullQueueModule } from './common/infra/queue/bull-queue.module';
 import { ActivationModule } from './features/activation/activation.module';
 import { AuthModule } from './features/auth/auth.module';
 import { BicycleModule } from './features/bicycle/bicycle.module';

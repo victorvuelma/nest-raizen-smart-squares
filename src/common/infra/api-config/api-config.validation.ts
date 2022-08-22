@@ -23,9 +23,12 @@ const _apiConfigScheme = z.object({
     .string()
     .default('3000')
     .transform((port) => Number(port)),
-  REDIS_PORT: z.string().transform((port) => Number(port)),
-  REDIS_HOST: z.string(),
-  REDIS_PASSWORD: z.string(),
+  REDIS_DB: z
+    .string()
+    .default('1')
+    .transform((db) => Number(db)),
+  REDIS_TLS_URL: z.string().url().optional(),
+  REDIS_URL: z.string().url(),
 });
 
 export type ApiConfigEnvironment = z.infer<typeof _apiConfigScheme>;

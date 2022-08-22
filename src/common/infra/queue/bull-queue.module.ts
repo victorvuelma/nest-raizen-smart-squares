@@ -1,8 +1,9 @@
-import { BullModule } from '@nestjs/bull';
-import { Module } from '@nestjs/common';
+import { BullModule, BullModuleOptions } from '@nestjs/bull';
+import { DynamicModule, Module } from '@nestjs/common';
 
 import { CommonModule } from '../../common.module';
 import { ApiConfigService } from '../api-config/api-config.service';
+import { BullBoardService } from './bull-board.service';
 
 @Module({
   imports: [
@@ -10,15 +11,21 @@ import { ApiConfigService } from '../api-config/api-config.service';
       imports: [CommonModule],
       inject: [ApiConfigService],
       useFactory: async (apiConfig: ApiConfigService) => ({
-        prefix: 'ss_',
+        url: apiConfig.redisTlsUrl ?? apiConfig.redisUrl,
         redis: {
-          host: apiConfig.redisHost,
-          port: apiConfig.redisPort,
-          password: apiConfig.redisPassword,
+          db: apiConfig.redisDb,
+          tls: {
+            rejectUnauthorized: false,
+          },
         },
       }),
     }),
   ],
-  exports: [BullModule],
+  providers: [BullBoardService],
+  exports: [BullModule, BullBoardService],
 })
-export class BullQueueModule {}
+export class BullQueueModule {
+  static registerQueue(...options: BullModuleOptions[]): DynamicModule {
+    return BullModule.registerQueue(...options);
+  }
+}

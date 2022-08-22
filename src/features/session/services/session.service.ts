@@ -1,8 +1,12 @@
+import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SessionStatus } from '@prisma/client';
+import { Queue } from 'bull';
 
+import { BullBoardService } from '../../../common/infra/queue/bull-board.service';
 import { BicycleService } from '../../bicycle/services/bicycle.service';
 import { CustomerService } from '../../customer/services/customer.service';
+import { CloseSessionDto } from '../dtos/close-session.dto';
 import { EndCustomerSessionDto } from '../dtos/end-customer-session.dto';
 import { StartSessionDto } from '../dtos/start-session.dto';
 import { SessionMapper } from '../mappers/session.mapper';
@@ -13,12 +17,29 @@ import { SessionValidator } from '../validators/session.validator';
 @Injectable()
 export class SessionService {
   constructor(
+    @InjectQueue('session-queue') private _sessionQueue: Queue,
+    _queueBoard: BullBoardService,
     private _customerService: CustomerService,
     private _bicycleService: BicycleService,
     private _sessionMapper: SessionMapper,
     private _sessionRepository: SessionRepository,
     private _sessionValidator: SessionValidator,
-  ) {}
+  ) {
+    _queueBoard.addQueue(_sessionQueue);
+  }
+
+  async get(sessionId: string): Promise<SessionModel> {
+    const session = await this._sessionRepository.get({
+      id: sessionId,
+    });
+    if (!session) {
+      throw new BadRequestException('Session not found');
+    }
+
+    const sessionModel = this._sessionMapper.mapper.map(session, SessionModel);
+
+    return sessionModel;
+  }
 
   async start(data: Partial<StartSessionDto>): Promise<SessionModel> {
     const start = this._sessionValidator.validateStart(data);
@@ -74,7 +95,30 @@ export class SessionService {
       data: { status: SessionStatus.ENDING, endAt: new Date() },
     });
 
+    await this._sessionQueue.add(
+      'close-session',
+      { sessionId: session.id },
+      { delay: 5000 },
+    );
+
     const sessionModel = this._sessionMapper.mapper.map(session, SessionModel);
+
+    return sessionModel;
+  }
+
+  async closeSession(data: Partial<CloseSessionDto>): Promise<SessionModel> {
+    const close = this._sessionValidator.validateClose(data);
+
+    const session = await this.get(close.sessionId);
+
+    const closedSession = await this._sessionRepository.update({
+      where: { id: session.id },
+      data: { status: SessionStatus.CLOSED, points: close.points },
+    });
+    const sessionModel = this._sessionMapper.mapper.map(
+      closedSession,
+      SessionModel,
+    );
 
     return sessionModel;
   }

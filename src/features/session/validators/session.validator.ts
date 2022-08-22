@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 
+import { CloseSessionDto } from '../dtos/close-session.dto';
 import { EndCustomerSessionDto } from '../dtos/end-customer-session.dto';
 import { StartSessionDto } from '../dtos/start-session.dto';
 
@@ -21,5 +22,14 @@ export class SessionValidator {
 
   validateEnd(data: Partial<EndCustomerSessionDto>): EndCustomerSessionDto {
     return this._endScheme.parse(data);
+  }
+
+  private _closeScheme = z.object({
+    sessionId: z.string().uuid(),
+    points: z.number().int().min(0),
+  });
+
+  validateClose(data: Partial<CloseSessionDto>): CloseSessionDto {
+    return this._closeScheme.parse(data);
   }
 }
