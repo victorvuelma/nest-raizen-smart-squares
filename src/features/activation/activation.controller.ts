@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -9,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { AuthenticatedUser } from '../auth/dto/jwt-payload.dto';
+import { AuthenticatedUserDto } from '../auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { ActivationService } from './services/activation.service';
 
@@ -21,7 +20,7 @@ export class ActivationController {
   @Post('activate/:offerId')
   @HttpCode(HttpStatus.CREATED)
   getProfile(@Request() req, @Param('offerId') offerId: string) {
-    const user = req.user as AuthenticatedUser;
+    const user = req.user as AuthenticatedUserDto;
 
     return this._activationService.activate({
       customerId: user.customerId,

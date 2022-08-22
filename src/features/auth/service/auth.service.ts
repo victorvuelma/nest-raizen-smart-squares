@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { CustomerModel } from '../../customer/models/customer.model';
 import { CustomerService } from '../../customer/services/customer.service';
-import { AuthenticatedUser } from '../dto/jwt-payload.dto';
+import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +12,7 @@ export class AuthService {
     private _jwtService: JwtService,
   ) {}
 
+  //TODO: RECEIVE AND VALIDATE DTO
   async authenticateCustomer(
     username: string,
     password: string,
@@ -25,7 +26,7 @@ export class AuthService {
   }
 
   async login(customer: CustomerModel) {
-    const payload: AuthenticatedUser = {
+    const payload: AuthenticatedUserDto = {
       sub: customer.id,
       customerId: customer.id,
       username: customer.email,

@@ -9,7 +9,7 @@ import { CreateCustomerDto } from '../dtos/create-customer.dto';
 
 @Injectable()
 export class CustomerValidator {
-  private _createCustomerScheme = z.object({
+  private _createScheme = z.object({
     name: z.string().min(1),
     email: z.string().email(),
     password: z.string().min(6),
@@ -22,24 +22,18 @@ export class CustomerValidator {
     gender: z.nativeEnum(Gender),
   });
 
-  private _authenticateCustomerScheme = z.object({
+  private _authenticateScheme = z.object({
     email: z.string().email(),
     password: z.string().min(6),
   });
 
-  validateCreateCustomer(
-    createCustomer: Partial<CreateCustomerDto>,
-  ): CreateCustomerDto {
-    const parsedCustomer = this._createCustomerScheme.parse(createCustomer);
-
-    return parsedCustomer;
+  validateCreate(data: Partial<CreateCustomerDto>): CreateCustomerDto {
+    return this._createScheme.parse(data);
   }
-  validateAuthenticateCustomer(
-    authenticateCustomer: Partial<AuthenticateCustomerDto>,
-  ): AuthenticateCustomerDto {
-    const parsedCustomer =
-      this._authenticateCustomerScheme.parse(authenticateCustomer);
 
-    return parsedCustomer;
+  validateAuthenticate(
+    data: Partial<AuthenticateCustomerDto>,
+  ): AuthenticateCustomerDto {
+    return this._authenticateScheme.parse(data);
   }
 }

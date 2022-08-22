@@ -37,14 +37,11 @@ export class CustomerService {
     return customerModel;
   }
 
-  async auth(
-    authenticate: Partial<AuthenticateCustomerDto>,
-  ): Promise<CustomerModel> {
-    const authenticateCustomer =
-      this._customerValidator.validateAuthenticateCustomer(authenticate);
+  async auth(data: Partial<AuthenticateCustomerDto>): Promise<CustomerModel> {
+    const authenticate = this._customerValidator.validateAuthenticate(data);
 
     const customer = await this._customerRepository.get({
-      email: authenticateCustomer.email,
+      email: authenticate.email,
     });
     if (!customer) {
       throw new UnauthorizedException('Invalid username or password provided');
@@ -52,7 +49,7 @@ export class CustomerService {
 
     const customerPassword = customer.password;
     const passwordMatches = await this._bcryptService.compare(
-      authenticateCustomer.password,
+      authenticate.password,
       customerPassword,
     );
     if (!passwordMatches) {
@@ -68,8 +65,7 @@ export class CustomerService {
   }
 
   async create(create: Partial<CreateCustomerDto>): Promise<CustomerModel> {
-    const createCustomer =
-      this._customerValidator.validateCreateCustomer(create);
+    const createCustomer = this._customerValidator.validateCreate(create);
 
     const hashedPassword = await this._bcryptService.hash(
       createCustomer.password,

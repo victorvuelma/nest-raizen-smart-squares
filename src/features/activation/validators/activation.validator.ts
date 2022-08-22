@@ -5,14 +5,12 @@ import { ActivateOfferDto } from '../dtos/activate-offer.dto';
 
 @Injectable()
 export class ActivationValidator {
-  private _activateOfferScheme = z.object({
+  private _activateScheme = z.object({
     customerId: z.string().uuid(),
     offerId: z.string().uuid(),
   });
 
-  validateActivateOffer(activate: Partial<ActivateOfferDto>): ActivateOfferDto {
-    const activateOffer = this._activateOfferScheme.parse(activate);
-
-    return activateOffer;
+  validateActivate(data: Partial<ActivateOfferDto>): ActivateOfferDto {
+    return this._activateScheme.parse(data);
   }
 }

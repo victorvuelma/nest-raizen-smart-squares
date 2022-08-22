@@ -23,14 +23,11 @@ export class ActivationService {
     private _activationValidator: ActivationValidator,
   ) {}
 
-  async activate(
-    activate: Partial<ActivateOfferDto>,
-  ): Promise<ActivationModel> {
-    const activateOffer =
-      this._activationValidator.validateActivateOffer(activate);
+  async activate(data: Partial<ActivateOfferDto>): Promise<ActivationModel> {
+    const activate = this._activationValidator.validateActivate(data);
 
-    const customer = await this._customerService.get(activateOffer.customerId);
-    const offer = await this._offerService.get(activateOffer.offerId);
+    const customer = await this._customerService.get(activate.customerId);
+    const offer = await this._offerService.get(activate.offerId);
 
     if (customer.points < offer.cost) {
       throw new BadRequestException(
@@ -41,7 +38,7 @@ export class ActivationService {
     const code = uuidV4().substring(0, 8).toUpperCase();
 
     const createActivation = this._activationRepository.create({
-      offer: { connect: { id: activateOffer.offerId } },
+      offer: { connect: { id: activate.offerId } },
       customer: { connect: { id: customer.id } },
       code: code,
     });

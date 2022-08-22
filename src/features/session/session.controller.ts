@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Param,
@@ -8,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { AuthenticatedUser } from '../auth/dto/jwt-payload.dto';
+import { AuthenticatedUserDto } from '../auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { SessionService } from './services/session.service';
 
@@ -17,14 +18,25 @@ export class SessionController {
   constructor(private readonly _sessionService: SessionService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post('start/:bicycleCode')
+  @Post('/:bicycleCode')
   @HttpCode(HttpStatus.CREATED)
-  getProfile(@Request() req, @Param('bicycleCode') bicycleCode: string) {
-    const user = req.user as AuthenticatedUser;
+  startSession(@Request() req, @Param('bicycleCode') bicycleCode: string) {
+    const user = req.user as AuthenticatedUserDto;
 
     return this._sessionService.start({
       customerId: user.customerId,
       bicycleCode,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/')
+  @HttpCode(HttpStatus.GONE)
+  endSession(@Request() req) {
+    const user = req.user as AuthenticatedUserDto;
+
+    return this._sessionService.endCustomerSession({
+      customerId: user.customerId,
     });
   }
 }

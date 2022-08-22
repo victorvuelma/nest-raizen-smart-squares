@@ -1,4 +1,4 @@
-export class AuthenticatedUser {
+export class AuthenticatedUserDto {
   sub: string;
 
   customerId: string;

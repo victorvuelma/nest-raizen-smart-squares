@@ -1,13 +1,14 @@
 import { AutoMap } from '@automapper/classes';
 import { SessionStatus } from '@prisma/client';
 
-export class SessionModel {
+export class ActivityModel {
   @AutoMap()
   id: string;
 
   @AutoMap()
   startAt: Date;
-  @AutoMap(() => Date)
+
+  @AutoMap()
   endAt: Date | null;
 
   @AutoMap()

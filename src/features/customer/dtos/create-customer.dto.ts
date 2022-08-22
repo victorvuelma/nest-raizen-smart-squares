@@ -1,24 +1,16 @@
-import { AutoMap } from '@automapper/classes';
 import { Gender } from '@prisma/client';
 
 export class CreateCustomerDto {
-  @AutoMap()
   email: string;
-  @AutoMap()
   password: string;
 
-  @AutoMap()
   cpf: string;
 
-  @AutoMap()
   name: string;
 
-  @AutoMap()
   phone: string | null;
 
-  @AutoMap()
   birthDate: Date;
-  @AutoMap(() => String)
   gender: Gender;
 
   constructor(

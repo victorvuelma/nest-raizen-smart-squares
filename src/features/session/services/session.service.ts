@@ -3,6 +3,7 @@ import { SessionStatus } from '@prisma/client';
 
 import { BicycleService } from '../../bicycle/services/bicycle.service';
 import { CustomerService } from '../../customer/services/customer.service';
+import { EndCustomerSessionDto } from '../dtos/end-customer-session.dto';
 import { StartSessionDto } from '../dtos/start-session.dto';
 import { SessionMapper } from '../mappers/session.mapper';
 import { SessionModel } from '../models/session.model';
@@ -19,26 +20,26 @@ export class SessionService {
     private _sessionValidator: SessionValidator,
   ) {}
 
-  async start(start: Partial<StartSessionDto>): Promise<SessionModel> {
-    const startSession = this._sessionValidator.validateStartSession(start);
+  async start(data: Partial<StartSessionDto>): Promise<SessionModel> {
+    const start = this._sessionValidator.validateStart(data);
 
     const [customer, bicycle] = await Promise.all([
-      this._customerService.get(startSession.customerId),
-      this._bicycleService.fromCode(startSession.bicycleCode),
+      this._customerService.get(start.customerId),
+      this._bicycleService.fromCode(start.bicycleCode),
     ]);
 
-    const [customerSessions, bicycleSessions] = await Promise.all([
-      this.findCustomerActiveSessions(customer.id),
-      this.findBicycleActiveSessions(bicycle.id),
+    const [customerSession, bicycleSession] = await Promise.all([
+      this.findCustomerActiveSession(customer.id),
+      this.findBicycleActiveSession(bicycle.id),
     ]);
 
-    if (customerSessions.length > 0) {
+    if (!!customerSession) {
       throw new BadRequestException(
         'Customer have an active session, please try again later.',
       );
     }
 
-    if (bicycleSessions.length > 0) {
+    if (!!bicycleSession) {
       throw new BadRequestException(
         'Bicycle have an active session, please try again later.',
       );
@@ -54,9 +55,33 @@ export class SessionService {
     return sessionModel;
   }
 
-  async findCustomerActiveSessions(
+  async endCustomerSession(
+    data: Partial<EndCustomerSessionDto>,
+  ): Promise<SessionModel> {
+    const end = this._sessionValidator.validateEnd(data);
+
+    const customer = await this._customerService.get(end.customerId);
+
+    const customerSession = await this.findCustomerActiveSession(customer.id);
+    if (!customerSession) {
+      throw new BadRequestException(
+        'Customer doesnt have an active session, please try again later.',
+      );
+    }
+
+    const session = await this._sessionRepository.update({
+      where: { id: customerSession.id },
+      data: { status: SessionStatus.ENDING, endAt: new Date() },
+    });
+
+    const sessionModel = this._sessionMapper.mapper.map(session, SessionModel);
+
+    return sessionModel;
+  }
+
+  async findCustomerActiveSession(
     customerId: string,
-  ): Promise<SessionModel[]> {
+  ): Promise<SessionModel | undefined> {
     const sessions = await this._sessionRepository.find({
       where: {
         customerId: customerId,
@@ -64,17 +89,23 @@ export class SessionService {
           status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
         },
       },
+      take: 1,
     });
+    if (!sessions.length) {
+      return;
+    }
 
-    const sessionsModels = this._sessionMapper.mapper.mapArray(
-      sessions,
+    const sessionModel = this._sessionMapper.mapper.map(
+      sessions[0],
       SessionModel,
     );
 
-    return sessionsModels;
+    return sessionModel;
   }
 
-  async findBicycleActiveSessions(bicycleId: string): Promise<SessionModel[]> {
+  async findBicycleActiveSession(
+    bicycleId: string,
+  ): Promise<SessionModel | undefined> {
     const sessions = await this._sessionRepository.find({
       where: {
         bicycleId: bicycleId,
@@ -82,13 +113,17 @@ export class SessionService {
           status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
         },
       },
+      take: 1,
     });
+    if (!sessions.length) {
+      return;
+    }
 
-    const sessionsModels = this._sessionMapper.mapper.mapArray(
-      sessions,
+    const sessionModel = this._sessionMapper.mapper.map(
+      sessions[0],
       SessionModel,
     );
 
-    return sessionsModels;
+    return sessionModel;
   }
 }
