@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Activity" ADD COLUMN     "cycles" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "potency" DECIMAL(5,5) NOT NULL DEFAULT 0;

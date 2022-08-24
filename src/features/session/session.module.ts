@@ -1,7 +1,11 @@
+import { InjectQueue } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
+import { Queue } from 'bull';
 
 import { CommonModule } from '../../common/common.module';
+import { BullBoardService } from '../../common/infra/queue/bull-board.service';
 import { BullQueueModule } from '../../common/infra/queue/bull-queue.module';
+import { QUEUES } from '../../common/infra/queue/queues';
 import { BicycleModule } from '../bicycle/bicycle.module';
 import { CustomerModule } from '../customer/customer.module';
 import { SessionMapper } from './mappers/session.mapper';
@@ -15,7 +19,7 @@ import { SessionValidator } from './validators/session.validator';
   imports: [
     BullQueueModule,
     BullQueueModule.registerQueue({
-      name: 'session-queue',
+      name: QUEUES.SESSION_QUEUE,
     }),
     CommonModule,
     BicycleModule,
@@ -29,5 +33,13 @@ import { SessionValidator } from './validators/session.validator';
     SessionService,
     SessionValidator,
   ],
+  exports: [SessionService],
 })
-export class SessionModule {}
+export class SessionModule {
+  constructor(
+    _queueBoardService: BullBoardService,
+    @InjectQueue(QUEUES.SESSION_QUEUE) _sessionQueue: Queue,
+  ) {
+    _queueBoardService.addQueue(_sessionQueue);
+  }
+}

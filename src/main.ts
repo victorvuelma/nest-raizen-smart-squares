@@ -2,6 +2,7 @@ import 'core-js/es/reflect';
 
 import fastifyHelmet from '@fastify/helmet';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -19,18 +20,32 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  app.setGlobalPrefix('v1');
-  app.useGlobalFilters(new HttpExceptionFilter(), new ZodExceptionFilter());
+  const apiConfig = app.get(ApiConfigService);
 
-  await app.getHttpAdapter().getInstance().register(fastifyHelmet);
-
-  // Starts listening for shutdown hooks
   app.enableShutdownHooks();
+
+  app
+    .setGlobalPrefix('v1')
+    .useGlobalFilters(new HttpExceptionFilter(), new ZodExceptionFilter());
+  await app.getHttpAdapter().getInstance().register(fastifyHelmet);
 
   const prisma = app.get(PrismaService);
   await prisma.enableShutdownHooks(app);
 
-  const apiConfig = app.get(ApiConfigService);
+  const mqttMicroservice = app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.MQTT,
+    options: {
+      hostname: apiConfig.mqttHostname,
+      port: apiConfig.mqttPort,
+      username: apiConfig.mqttUser,
+      password: apiConfig.mqttPassword,
+      protocol: apiConfig.mqttProtocol,
+      protocolVersion: apiConfig.mqttProtocolVersion,
+    },
+  });
+  mqttMicroservice.enableShutdownHooks();
+
+  await app.startAllMicroservices();
   await app.listen(apiConfig.port, apiConfig.host);
 }
 bootstrap();

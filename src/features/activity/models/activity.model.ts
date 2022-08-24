@@ -1,42 +1,33 @@
 import { AutoMap } from '@automapper/classes';
-import { SessionStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export class ActivityModel {
   @AutoMap()
   id: string;
 
   @AutoMap()
-  startAt: Date;
-
-  @AutoMap()
-  endAt: Date | null;
+  when: Date;
 
   @AutoMap()
   points: number;
 
   @AutoMap()
-  status: SessionStatus;
+  potency: Prisma.Decimal;
 
   @AutoMap()
-  bicycleId: string;
-  @AutoMap()
-  customerId: string;
+  cycles: number;
 
   constructor(
     id: string,
-    startAt: Date,
-    endAt: Date | null,
+    when: Date,
     points: number,
-    status: SessionStatus,
-    bicycleId: string,
-    customerId: string,
+    potency: Prisma.Decimal,
+    cycles: number,
   ) {
     this.id = id;
-    this.startAt = startAt;
-    this.endAt = endAt;
+    this.when = when;
     this.points = points;
-    this.status = status;
-    this.bicycleId = bicycleId;
-    this.customerId = customerId;
+    this.potency = potency;
+    this.cycles = cycles;
   }
 }

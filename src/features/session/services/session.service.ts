@@ -3,7 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { SessionStatus } from '@prisma/client';
 import { Queue } from 'bull';
 
-import { BullBoardService } from '../../../common/infra/queue/bull-board.service';
+import { QUEUES } from '../../../common/infra/queue/queues';
 import { BicycleService } from '../../bicycle/services/bicycle.service';
 import { CustomerService } from '../../customer/services/customer.service';
 import { CloseSessionDto } from '../dtos/close-session.dto';
@@ -17,16 +17,13 @@ import { SessionValidator } from '../validators/session.validator';
 @Injectable()
 export class SessionService {
   constructor(
-    @InjectQueue('session-queue') private _sessionQueue: Queue,
-    _queueBoard: BullBoardService,
+    @InjectQueue(QUEUES.SESSION_QUEUE) private _sessionQueue: Queue,
     private _customerService: CustomerService,
     private _bicycleService: BicycleService,
     private _sessionMapper: SessionMapper,
     private _sessionRepository: SessionRepository,
     private _sessionValidator: SessionValidator,
-  ) {
-    _queueBoard.addQueue(_sessionQueue);
-  }
+  ) {}
 
   async get(sessionId: string): Promise<SessionModel> {
     const session = await this._sessionRepository.get({
@@ -159,6 +156,7 @@ export class SessionService {
       },
       take: 1,
     });
+
     if (!sessions.length) {
       return;
     }

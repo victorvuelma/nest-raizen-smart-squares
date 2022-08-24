@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { CommonModule } from './common/common.module';
 import { ActivationModule } from './features/activation/activation.module';
+import { ActivityModule } from './features/activity/activity.module';
 import { AuthModule } from './features/auth/auth.module';
 import { BicycleModule } from './features/bicycle/bicycle.module';
 import { CustomerModule } from './features/customer/customer.module';
@@ -13,6 +14,7 @@ import { SessionModule } from './features/session/session.module';
   imports: [
     CommonModule,
     ActivationModule,
+    ActivityModule,
     AuthModule,
     BicycleModule,
     CustomerModule,

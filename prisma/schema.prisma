@@ -87,6 +87,8 @@ model Activity {
   id              String            @id   @db.Uuid()  @default(uuid())
   when            DateTime          @default(now())
   points          Int               
+  potency         Decimal           @db.Decimal(5, 5) @default(0)
+  cycles          Int               @default(0)
   session         Session           @relation(fields: [sessionId], references: [id])
   sessionId       String            @db.Uuid()
   createdAt       DateTime          @default(now())
