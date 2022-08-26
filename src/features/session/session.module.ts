@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { Queue } from 'bull';
 
 import { CommonModule } from '../../common/common.module';
+import { RedisCacheModule } from '../../common/infra/cache/redis.module';
 import { BullBoardService } from '../../common/infra/queue/bull-board.service';
 import { BullQueueModule } from '../../common/infra/queue/bull-queue.module';
 import { QUEUES } from '../../common/infra/queue/queues';
@@ -23,6 +24,7 @@ import { SessionValidator } from './validators/session.validator';
     BullQueueModule.registerQueue({
       name: QUEUES.SESSION_QUEUE,
     }),
+    RedisCacheModule,
     CommonModule,
     AuthModule,
     BicycleModule,
