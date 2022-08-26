@@ -63,11 +63,19 @@ export class ApiConfigService {
     return this._configService.getOrThrow<number>('REDIS_DB');
   }
 
-  get redisTlsUrl(): string | undefined {
-    return this._configService.get<string>('REDIS_TLS_URL');
+  get redisHost(): string {
+    return this._configService.getOrThrow<string>('REDIS_HOST');
   }
 
-  get redisUrl(): string {
-    return this._configService.getOrThrow<string>('REDIS_URL');
+  get redisPassword(): string {
+    return this._configService.getOrThrow<string>('REDIS_PASSWORD');
+  }
+
+  get redisPort(): number {
+    return this._configService.getOrThrow<number>('REDIS_PORT');
+  }
+
+  get redisTLS(): boolean {
+    return this._configService.getOrThrow<boolean>('REDIS_TLS');
   }
 }

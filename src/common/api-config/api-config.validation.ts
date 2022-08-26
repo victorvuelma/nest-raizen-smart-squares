@@ -27,8 +27,10 @@ const _apiConfigScheme = z.object({
     .string()
     .default('1')
     .transform((db) => Number(db)),
-  REDIS_TLS_URL: z.string().url().optional(),
-  REDIS_URL: z.string().url(),
+  REDIS_HOST: z.string(),
+  REDIS_PASSWORD: z.string(),
+  REDIS_PORT: z.string().transform((db) => Number(db)),
+  REDIS_TLS: z.string().transform((tls) => Boolean(tls)),
 });
 
 export type ApiConfigEnvironment = z.infer<typeof _apiConfigScheme>;

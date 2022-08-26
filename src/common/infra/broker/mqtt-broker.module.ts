@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
+import { ApiConfigService } from '../../api-config/api-config.service';
 import { CommonModule } from '../../common.module';
-import { ApiConfigService } from '../api-config/api-config.service';
 
 @Module({
   imports: [
