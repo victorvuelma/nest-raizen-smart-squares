@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { SessionStatus } from '@prisma/client';
 import { Queue } from 'bull';
+import * as dayjs from 'dayjs';
 
 import { QUEUES } from '../../../common/infra/queue/queues';
 import { BicycleService } from '../../bicycle/services/bicycle.service';
@@ -14,6 +15,7 @@ import { SessionGateway } from '../gateway/session.gateway';
 import { SessionMapper } from '../mappers/session.mapper';
 import { SessionModel } from '../models/session.model';
 import { SessionRepository } from '../repository/session.repository';
+import { SESSION_JOBS } from '../session.jobs';
 import { SessionValidator } from '../validators/session.validator';
 
 @Injectable()
@@ -96,7 +98,7 @@ export class SessionService {
     });
 
     await this._sessionQueue.add(
-      'close-session',
+      SESSION_JOBS.PROCESS_CLOSE_SESSION,
       { sessionId: session.id },
       { delay: 5000 },
     );
@@ -129,9 +131,7 @@ export class SessionService {
     const sessions = await this._sessionRepository.find({
       where: {
         customerId: customerId,
-        AND: {
-          status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
-        },
+        status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
       },
       take: 1,
     });
@@ -153,9 +153,7 @@ export class SessionService {
     const sessions = await this._sessionRepository.find({
       where: {
         bicycleId: bicycleId,
-        AND: {
-          status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
-        },
+        status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
       },
       take: 1,
     });
@@ -172,8 +170,34 @@ export class SessionService {
     return sessionModel;
   }
 
-  @Cron('*/1 * * * *')
+  @Cron('* * * * *')
   keepAliveGateway(): void {
     this._sessionGateway.sendKeepAlive();
+  }
+
+  @Cron('* * * * *')
+  async processInactiveSessions(): Promise<void> {
+    const inactiveSessions = await this._sessionRepository.find({
+      where: {
+        status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
+        activities: {
+          none: {
+            when: {
+              gte: dayjs().subtract(1, 'minute').toDate(),
+            },
+          },
+        },
+      },
+    });
+
+    await this._sessionQueue.add(
+      inactiveSessions.map(
+        (session) => (
+          SESSION_JOBS.PROCESS_CLOSE_SESSION,
+          { sessionId: session.id },
+          { delay: 5000 }
+        ),
+      ),
+    );
   }
 }
