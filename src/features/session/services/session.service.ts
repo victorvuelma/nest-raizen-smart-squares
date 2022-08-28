@@ -1,5 +1,6 @@
 import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { SessionStatus } from '@prisma/client';
 import { Queue } from 'bull';
 
@@ -9,6 +10,7 @@ import { CustomerService } from '../../customer/services/customer.service';
 import { CloseSessionDto } from '../dtos/close-session.dto';
 import { EndCustomerSessionDto } from '../dtos/end-customer-session.dto';
 import { StartSessionDto } from '../dtos/start-session.dto';
+import { SessionGateway } from '../gateway/session.gateway';
 import { SessionMapper } from '../mappers/session.mapper';
 import { SessionModel } from '../models/session.model';
 import { SessionRepository } from '../repository/session.repository';
@@ -20,6 +22,7 @@ export class SessionService {
     @InjectQueue(QUEUES.SESSION_QUEUE) private _sessionQueue: Queue,
     private _customerService: CustomerService,
     private _bicycleService: BicycleService,
+    private _sessionGateway: SessionGateway,
     private _sessionMapper: SessionMapper,
     private _sessionRepository: SessionRepository,
     private _sessionValidator: SessionValidator,
@@ -167,5 +170,10 @@ export class SessionService {
     );
 
     return sessionModel;
+  }
+
+  @Cron('*/1 * * * *')
+  keepAliveGateway(): void {
+    this._sessionGateway.sendKeepAlive();
   }
 }

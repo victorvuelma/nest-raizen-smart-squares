@@ -18,7 +18,7 @@ export const AuthSocketMiddleware = (
   return async (socket: Socket, next) => {
     try {
       const jwtToken =
-        socket.handshake.auth.jwt ?? socket.handshake.headers.access_token;
+        socket.handshake.auth.jwt ?? socket.handshake.headers['authorization'];
 
       const authenticatedUser = jwtService.verify(
         jwtToken,

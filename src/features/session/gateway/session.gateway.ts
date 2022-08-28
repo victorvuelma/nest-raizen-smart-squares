@@ -8,12 +8,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Cache } from 'cache-manager';
-import { Namespace, Server } from 'socket.io';
+import { Namespace } from 'socket.io';
 
 import {
   AuthenticatedSocket,
   AuthSocketMiddleware,
-} from '../../auth/middleware/auth.wsmiddleware';
+} from '../../auth/gateway/auth.middleware';
 
 @WebSocketGateway({
   namespace: '/sessions',
@@ -25,7 +25,7 @@ export class SessionGateway
     OnGatewayDisconnect<AuthenticatedSocket>
 {
   @WebSocketServer()
-  server!: Server;
+  private readonly _server!: Namespace;
 
   constructor(
     @Inject(CACHE_MANAGER) private _cache: Cache,
@@ -43,6 +43,10 @@ export class SessionGateway
 
   handleDisconnect(client: AuthenticatedSocket) {
     this._cache.del(this._customerKey(client.user.customerId));
+  }
+
+  sendKeepAlive(): void {
+    this._server.sockets.forEach((client) => client.emit('keep-alive', true));
   }
 
   private _customerKey(customerId: string) {
