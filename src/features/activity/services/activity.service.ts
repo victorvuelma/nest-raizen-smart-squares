@@ -16,7 +16,7 @@ export class ActivityService {
     private _activityValidator: ActivityValidator,
   ) {}
 
-  async save(data: SaveActivityDto): Promise<ActivityModel> {
+  async save(data: SaveActivityDto): Promise<ActivityModel | null> {
     const save = this._activityValidator.validateSave(data);
 
     const session = await this._sessionService.findBicycleActiveSession(
@@ -24,6 +24,10 @@ export class ActivityService {
     );
     if (!session) {
       throw new BadRequestException('No session found for bicycle');
+    }
+
+    if (save.cycles <= 0 && save.potency <= 0) {
+      return null;
     }
 
     const activity = await this._activityRepository.create({

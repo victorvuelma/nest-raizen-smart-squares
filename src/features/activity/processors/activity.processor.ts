@@ -9,8 +9,6 @@ import { ActivityService } from '../services/activity.service';
 
 @Processor(QUEUES.ACTIVITY_QUEUE)
 export class ActivityQueueProcessor {
-  protected readonly logger = new Logger('ActivityQueueProcessor');
-
   constructor(private _activityService: ActivityService) {}
 
   @Process(ACTIVITY_JOBS.PROCESS_BIKE_INPUT)
@@ -23,6 +21,8 @@ export class ActivityQueueProcessor {
     });
 
     await job.progress(100);
-    await job.moveToCompleted(activity.id);
+    await job.moveToCompleted(
+      !!activity ? `activity:${activity.id}` : 'activity:skipped',
+    );
   }
 }
