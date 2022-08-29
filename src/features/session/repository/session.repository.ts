@@ -1,7 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, PrismaPromise, Session } from '@prisma/client';
+import {
+  Activity,
+  Bicycle,
+  Prisma,
+  PrismaPromise,
+  Session,
+} from '@prisma/client';
 
 import { PrismaService } from '../../../common/infra/database/prisma.service';
+
+type SessionDetail = Session & {
+  activities: Activity[];
+  bicycle: Bicycle;
+};
 
 @Injectable()
 export class SessionRepository {
@@ -9,9 +20,10 @@ export class SessionRepository {
 
   get(
     sessionWhereUniqueInput: Prisma.SessionWhereUniqueInput,
-  ): PrismaPromise<Session | null> {
+  ): PrismaPromise<SessionDetail | null> {
     return this._prisma.session.findUnique({
       where: sessionWhereUniqueInput,
+      include: { activities: true, bicycle: true },
     });
   }
 

@@ -1,9 +1,11 @@
 import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { SessionStatus } from '@prisma/client';
 import { Queue } from 'bull';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
+import sumBy from 'lodash/sumBy';
 
 import { QUEUES } from '../../../common/infra/queue/queues';
 import { BicycleService } from '../../bicycle/services/bicycle.service';
@@ -14,12 +16,15 @@ import { StartSessionDto } from '../dtos/start-session.dto';
 import { SessionGateway } from '../gateway/session.gateway';
 import { SessionMapper } from '../mappers/session.mapper';
 import { SessionModel } from '../models/session.model';
+import { SessionDetailModel } from '../models/session-detail.model';
 import { SessionRepository } from '../repository/session.repository';
 import { SESSION_JOBS } from '../session.jobs';
 import { SessionValidator } from '../validators/session.validator';
 
 @Injectable()
 export class SessionService {
+  private readonly _logger = new Logger(SessionService.name);
+
   constructor(
     @InjectQueue(QUEUES.SESSION_QUEUE) private _sessionQueue: Queue,
     private _customerService: CustomerService,
@@ -115,7 +120,11 @@ export class SessionService {
 
     const closedSession = await this._sessionRepository.update({
       where: { id: session.id },
-      data: { status: SessionStatus.CLOSED, points: close.points },
+      data: {
+        status: SessionStatus.CLOSED,
+        points: close.points,
+        endAt: new Date(),
+      },
     });
     const sessionModel = this._sessionMapper.mapper.map(
       closedSession,
@@ -170,34 +179,76 @@ export class SessionService {
     return sessionModel;
   }
 
-  @Cron('* * * * *')
+  @Cron('*/1 * * * *')
   keepAliveGateway(): void {
     this._sessionGateway.sendKeepAlive();
   }
 
-  @Cron('* * * * *')
+  @Cron('*/1 * * * *')
   async processInactiveSessions(): Promise<void> {
     const inactiveSessions = await this._sessionRepository.find({
       where: {
         status: { in: [SessionStatus.RUNNING, SessionStatus.STARTING] },
+        createdAt: { lt: dayjs().subtract(2, 'minute').toDate() },
         activities: {
           none: {
             when: {
-              gte: dayjs().subtract(1, 'minute').toDate(),
+              gte: dayjs().subtract(2, 'minute').toDate(),
             },
           },
         },
       },
     });
 
-    await this._sessionQueue.add(
-      inactiveSessions.map(
-        (session) => (
-          SESSION_JOBS.PROCESS_CLOSE_SESSION,
-          { sessionId: session.id },
-          { delay: 5000 }
-        ),
-      ),
+    if (inactiveSessions.length > 0) {
+      await this._sessionQueue.addBulk(
+        inactiveSessions.map((session) => ({
+          name: SESSION_JOBS.PROCESS_CLOSE_SESSION,
+          data: { sessionId: session.id },
+          opts: { delay: 5000 },
+        })),
+      );
+
+      this._logger.log(
+        `Added ${inactiveSessions.length} inactive sessions to close queue.`,
+      );
+    }
+  }
+
+  async updateSession(sessionId: string): Promise<SessionDetailModel | null> {
+    const session = await this._sessionRepository.get({
+      id: sessionId,
+    });
+    if (!session) {
+      throw new BadRequestException('No session found with provided id');
+    }
+
+    if (session?.status == SessionStatus.STARTING) {
+      await this._sessionRepository.update({
+        where: { id: sessionId },
+        data: { status: SessionStatus.RUNNING },
+      });
+    }
+
+    const detail = await this._sessionRepository.get({
+      id: sessionId,
+    });
+    if (!detail) {
+      return null;
+    }
+
+    const sessionDetail = {
+      ...detail,
+      cycles: sumBy(detail.activities, (a) => a.cycles),
+      potency: sumBy(detail.activities, (a) => a.potency as any as number),
+    };
+    const sessionDetailModel = this._sessionMapper.mapper.map(
+      sessionDetail,
+      SessionDetailModel,
     );
+
+    this._sessionGateway.notifySessionUpdate(sessionDetailModel);
+
+    return sessionDetailModel;
   }
 }

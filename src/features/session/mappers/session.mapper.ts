@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import { MapperService } from '../../../common/infra/mapper/mapper.service';
 import { SessionModel } from '../models/session.model';
+import { SessionDetailModel } from '../models/session-detail.model';
 
 @Injectable()
 export class SessionMapper {
@@ -12,5 +13,11 @@ export class SessionMapper {
 
   constructor(private _mapperService: MapperService) {
     createMap(this._mapperService.mapper, SessionModel, SessionModel);
+
+    createMap(
+      this._mapperService.mapper,
+      SessionDetailModel,
+      SessionDetailModel,
+    );
   }
 }

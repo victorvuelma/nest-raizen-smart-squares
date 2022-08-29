@@ -1,5 +1,4 @@
 import { AutoMap } from '@automapper/classes';
-import { Prisma } from '@prisma/client';
 
 export class ActivityModel {
   @AutoMap()
@@ -12,22 +11,27 @@ export class ActivityModel {
   points: number;
 
   @AutoMap()
-  potency: Prisma.Decimal;
+  potency: number;
 
   @AutoMap()
   cycles: number;
+
+  @AutoMap()
+  sessionId: string;
 
   constructor(
     id: string,
     when: Date,
     points: number,
-    potency: Prisma.Decimal,
+    potency: number,
     cycles: number,
+    sessionId: string,
   ) {
     this.id = id;
     this.when = when;
     this.points = points;
     this.potency = potency;
     this.cycles = cycles;
+    this.sessionId = sessionId;
   }
 }

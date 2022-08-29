@@ -8,12 +8,14 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Cache } from 'cache-manager';
-import { Namespace } from 'socket.io';
+import * as duration from 'duration-fns';
+import { Namespace, Socket } from 'socket.io';
 
 import {
   AuthenticatedSocket,
   AuthSocketMiddleware,
 } from '../../auth/gateway/auth.middleware';
+import { SessionDetailModel } from '../models/session-detail.model';
 
 @WebSocketGateway({
   namespace: '/sessions',
@@ -38,7 +40,9 @@ export class SessionGateway
   }
 
   handleConnection(client: AuthenticatedSocket) {
-    this._cache.set(this._customerKey(client.user.customerId), client.id);
+    this._cache.set(this._customerKey(client.user.customerId), client.id, {
+      ttl: duration.toSeconds({ hours: 1 }),
+    });
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
@@ -47,6 +51,29 @@ export class SessionGateway
 
   sendKeepAlive(): void {
     this._server.sockets.forEach((client) => client.emit('keep-alive', true));
+  }
+
+  private async getCustomerSocket(
+    customerId: string,
+  ): Promise<Socket | undefined> {
+    const socketId = await this._cache.get<string>(
+      this._customerKey(customerId),
+    );
+    if (!socketId) {
+      return undefined;
+    }
+
+    return this._server.sockets.get(socketId);
+  }
+
+  async notifySessionUpdate(session: SessionDetailModel): Promise<void> {
+    const customerSocket = await this.getCustomerSocket(session.customerId);
+
+    customerSocket?.emit('session-update', {
+      cycles: session.cycles,
+      potency: session.potency,
+      points: session.points,
+    });
   }
 
   private _customerKey(customerId: string) {
