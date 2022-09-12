@@ -6,6 +6,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
 
 import { CustomerAuthGuard } from './guards/auth.guard';
 import { AuthService } from './service/auth.service';
@@ -17,7 +18,7 @@ export class AuthController {
   @UseGuards(CustomerAuthGuard)
   @Post('customer')
   @HttpCode(HttpStatus.OK)
-  async customer(@Request() req) {
-    return this._authService.login(req.user);
+  async customer(@Request() req: FastifyRequest) {
+    return this._authService.login(req['user']);
   }
 }

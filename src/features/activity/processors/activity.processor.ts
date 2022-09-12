@@ -23,13 +23,14 @@ export class ActivityQueueProcessor {
       ...data,
     });
 
-    if (!!activity?.sessionId) {
-      await this._sessionService.updateSession(activity.sessionId);
+    if (!activity?.sessionId) {
+      await job.moveToCompleted('activity:skipped');
+      return;
     }
 
+    await this._sessionService.updateSession(activity.sessionId);
+
     await job.progress(100);
-    await job.moveToCompleted(
-      !!activity ? `activity:${activity.id}` : 'activity:skipped',
-    );
+    await job.moveToCompleted(`activity:${activity.id}`);
   }
 }

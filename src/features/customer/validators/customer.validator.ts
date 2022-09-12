@@ -9,6 +9,8 @@ import { CreateCustomerDto } from '../dtos/create-customer.dto';
 
 @Injectable()
 export class CustomerValidator {
+  private _idScheme = z.string().uuid();
+
   private _createScheme = z.object({
     name: z.string().min(1),
     email: z.string().email(),
@@ -26,6 +28,10 @@ export class CustomerValidator {
     email: z.string().email(),
     password: z.string().min(6),
   });
+
+  validateId(data: string): string {
+    return this._idScheme.parse(data);
+  }
 
   validateCreate(data: Partial<CreateCustomerDto>): CreateCustomerDto {
     return this._createScheme.parse(data);

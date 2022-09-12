@@ -1,10 +1,11 @@
 import { JwtService } from '@nestjs/jwt';
 import { Socket } from 'socket.io';
 
-import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
+import { AuthenticatedProfileDto } from '../dto/authenticated-profile.dto';
+import { AuthenticatedSessionDto } from '../dto/authenticated-session.dto';
 
 export interface AuthenticatedSocket extends Socket {
-  user: AuthenticatedUserDto;
+  user: AuthenticatedProfileDto;
 }
 
 export type SocketMiddleware = (
@@ -20,12 +21,12 @@ export const AuthSocketMiddleware = (
       const jwtToken =
         socket.handshake.auth.jwt ?? socket.handshake.headers['authorization'];
 
-      const authenticatedUser = jwtService.verify(
+      const authenticatedSession = jwtService.verify(
         jwtToken,
-      ) as AuthenticatedUserDto;
+      ) as AuthenticatedSessionDto;
 
       const authSocket = socket as AuthenticatedSocket;
-      authSocket.user = authenticatedUser;
+      authSocket.user = authenticatedSession.profile;
 
       return next();
     } catch (error) {

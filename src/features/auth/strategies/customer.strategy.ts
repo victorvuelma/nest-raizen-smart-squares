@@ -14,10 +14,10 @@ export class CustomerAuthStrategy extends PassportStrategy(
   }
 
   async validate(username: string, password: string): Promise<any> {
-    const customer = await this._authService.authenticateCustomer(
+    const customer = await this._authService.authenticate({
       username,
       password,
-    );
+    });
 
     return customer;
   }

@@ -11,7 +11,7 @@ export class ActivityController {
   constructor(@InjectQueue('activity-queue') private _activityQueue: Queue) {}
 
   @MessagePattern('bicycles/+/activity')
-  getNotifications(@Payload() data: BikeActivityInputDto) {
+  receiveByciclesActivity(@Payload() data: BikeActivityInputDto) {
     this._activityQueue.add(ACTIVITY_JOBS.PROCESS_BIKE_INPUT, data);
 
     return true;

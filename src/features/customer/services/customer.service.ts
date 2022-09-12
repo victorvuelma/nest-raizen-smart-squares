@@ -22,8 +22,10 @@ export class CustomerService {
   ) {}
 
   async get(customerId: string): Promise<CustomerModel> {
+    const id = this._customerValidator.validateId(customerId);
+
     const customer = await this._customerRepository.get({
-      id: customerId,
+      id,
     });
     if (!customer) {
       throw new BadRequestException('Customer not found');

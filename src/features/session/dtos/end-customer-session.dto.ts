@@ -1,7 +1,3 @@
-export class EndCustomerSessionDto {
+export interface EndCustomerSessionDto {
   customerId: string;
-
-  constructor(customerId: string) {
-    this.customerId = customerId;
-  }
 }

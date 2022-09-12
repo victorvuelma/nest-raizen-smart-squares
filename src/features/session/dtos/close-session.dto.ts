@@ -1,10 +1,5 @@
-export class CloseSessionDto {
+export interface CloseSessionDto {
   sessionId: string;
 
   points: number;
-
-  constructor(sessionId: string, points: number) {
-    this.sessionId = sessionId;
-    this.points = points;
-  }
 }

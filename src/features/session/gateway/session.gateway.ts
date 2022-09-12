@@ -40,13 +40,13 @@ export class SessionGateway
   }
 
   handleConnection(client: AuthenticatedSocket) {
-    this._cache.set(this._customerKey(client.user.customerId), client.id, {
+    this._cache.set(this._customerKey(client.user.id), client.id, {
       ttl: duration.toSeconds({ hours: 1 }),
     });
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
-    this._cache.del(this._customerKey(client.user.customerId));
+    this._cache.del(this._customerKey(client.user.id));
   }
 
   sendKeepAlive(): void {

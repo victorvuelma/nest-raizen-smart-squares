@@ -3,20 +3,23 @@ import { JwtService } from '@nestjs/jwt';
 
 import { CustomerModel } from '../../customer/models/customer.model';
 import { CustomerService } from '../../customer/services/customer.service';
-import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
+import { AuthenticateUserDto } from '../dto/authenticate-customer.dto';
+import { AuthenticatedResponseDto } from '../dto/authenticated-response.dto';
+import { AuthenticatedSessionDto } from '../dto/authenticated-session.dto';
+import { AuthValidator } from '../validators/auth.validator';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private _authValidator: AuthValidator,
     private _customerService: CustomerService,
     private _jwtService: JwtService,
   ) {}
 
-  //TODO: RECEIVE AND VALIDATE DTO
-  async authenticateCustomer(
-    username: string,
-    password: string,
-  ): Promise<CustomerModel> {
+  async authenticate(data: AuthenticateUserDto): Promise<CustomerModel> {
+    const { username, password } =
+      this._authValidator.validateAuthenticate(data);
+
     const customer = await this._customerService.auth({
       email: username,
       password,
@@ -25,18 +28,23 @@ export class AuthService {
     return customer;
   }
 
-  async login(customer: CustomerModel) {
-    const payload: AuthenticatedUserDto = {
+  async login(customer: CustomerModel): Promise<AuthenticatedResponseDto> {
+    const payload: AuthenticatedSessionDto = {
       sub: customer.id,
-      customerId: customer.id,
-      username: customer.email,
-      name: customer.name,
-      email: customer.email,
+      profile: {
+        id: customer.id,
+        username: customer.email,
+        name: customer.name,
+        email: customer.email,
+      },
     };
 
-    return {
-      access_token: this._jwtService.sign(payload),
-      ...customer,
+    const access_token = await this._jwtService.signAsync(payload);
+    const session: AuthenticatedResponseDto = {
+      access_token: access_token,
+      ...payload,
     };
+
+    return session;
   }
 }

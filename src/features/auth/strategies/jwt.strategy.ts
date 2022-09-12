@@ -3,7 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ApiConfigService } from '../../../common/api-config/api-config.service';
-import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
+import { AuthenticatedProfileDto } from '../dto/authenticated-profile.dto';
+import { AuthenticatedSessionDto } from '../dto/authenticated-session.dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'JWT') {
@@ -15,13 +16,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'JWT') {
     });
   }
 
-  async validate(payload: AuthenticatedUserDto) {
+  async validate(
+    payload: AuthenticatedSessionDto,
+  ): Promise<AuthenticatedProfileDto> {
     return {
-      id: payload.sub,
-      customerId: payload.customerId,
-      username: payload.username,
-      email: payload.email,
-      name: payload.name,
+      id: payload.profile.id,
+      username: payload.profile.username,
+      email: payload.profile.email,
+      name: payload.profile.name,
     };
   }
 }
