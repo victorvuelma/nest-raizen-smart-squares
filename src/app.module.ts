@@ -9,6 +9,7 @@ import { BicycleModule } from './features/bicycle/bicycle.module';
 import { CustomerModule } from './features/customer/customer.module';
 import { OfferModule } from './features/offer/offer.module';
 import { PartnerModule } from './features/partner/partner.module';
+import { PlaceModule } from './features/place/place.module';
 import { SessionModule } from './features/session/session.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { SessionModule } from './features/session/session.module';
     CustomerModule,
     OfferModule,
     PartnerModule,
+    PlaceModule,
     SessionModule,
   ],
   exports: [CommonModule, CustomerModule, OfferModule],
