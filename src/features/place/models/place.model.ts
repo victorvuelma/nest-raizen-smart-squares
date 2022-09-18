@@ -10,6 +10,11 @@ export class PlaceModel {
   address: string;
 
   @AutoMap()
+  lat: number;
+  @AutoMap()
+  lng: number;
+
+  @AutoMap()
   active: boolean;
 
   @AutoMap()
@@ -21,6 +26,8 @@ export class PlaceModel {
     id: string,
     name: string,
     address: string,
+    lat: number,
+    lng: number,
     active: boolean,
     createdAt: Date,
     updatedAt?: Date,
@@ -28,6 +35,8 @@ export class PlaceModel {
     this.id = id;
     this.name = name;
     this.address = address;
+    this.lat = lat;
+    this.lng = lng;
     this.active = active;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
