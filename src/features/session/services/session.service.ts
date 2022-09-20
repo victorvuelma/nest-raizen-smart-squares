@@ -195,11 +195,6 @@ export class SessionService {
   }
 
   @Cron('*/1 * * * *')
-  keepAliveGateway(): void {
-    this._sessionGateway.sendKeepAlive();
-  }
-
-  @Cron('*/1 * * * *')
   async processInactiveSessions(): Promise<void> {
     const inactiveSessions = await this._sessionRepository.find({
       where: {

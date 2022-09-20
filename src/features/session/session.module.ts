@@ -7,6 +7,7 @@ import { RedisCacheModule } from '../../common/infra/cache/redis.module';
 import { BullBoardService } from '../../common/infra/queue/bull-board.service';
 import { BullQueueModule } from '../../common/infra/queue/bull-queue.module';
 import { QUEUES } from '../../common/infra/queue/queues';
+import { SocketIoModule } from '../../common/infra/websocket/socketio.module';
 import { AuthModule } from '../auth/auth.module';
 import { BicycleModule } from '../bicycle/bicycle.module';
 import { CustomerModule } from '../customer/customer.module';
@@ -25,6 +26,7 @@ import { SessionValidator } from './validators/session.validator';
       name: QUEUES.SESSION_QUEUE,
     }),
     RedisCacheModule,
+    SocketIoModule,
     CommonModule,
     AuthModule,
     BicycleModule,

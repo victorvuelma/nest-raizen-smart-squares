@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { CommonModule } from './common/common.module';
+import { SocketIoModule } from './common/infra/websocket/socketio.module';
 import { ActivationModule } from './features/activation/activation.module';
 import { ActivityModule } from './features/activity/activity.module';
 import { AuthModule } from './features/auth/auth.module';
@@ -16,6 +17,7 @@ import { SessionModule } from './features/session/session.module';
   imports: [
     CommonModule,
     ScheduleModule.forRoot(),
+    SocketIoModule,
     ActivationModule,
     ActivityModule,
     AuthModule,
