@@ -1,6 +1,9 @@
+import { Injectable } from '@nestjs/common';
+
 import { SocketIoGateway } from '../../../common/infra/websocket/socketio.gateway';
 import { SessionDetailModel } from '../models/session-detail.model';
 
+@Injectable()
 export class SessionGateway {
   constructor(private readonly _socketIoGateway: SocketIoGateway) {}
 
