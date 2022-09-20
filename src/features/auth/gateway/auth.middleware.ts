@@ -15,25 +15,32 @@ export type SocketMiddleware = (
 
 export const AuthSocketMiddleware = (
   jwtService: JwtService,
+  isDevelopment: boolean,
 ): SocketMiddleware => {
   return async (socket: Socket, next) => {
-    try {
-      const jwtToken =
-        socket.handshake.auth.jwt ?? socket.handshake.headers['authorization'];
+    const tokenPayload: string | undefined =
+      socket.handshake?.auth?.token ??
+      (isDevelopment && socket.handshake.headers['authorization']);
+    if (!tokenPayload) {
+      return next(new Error('Authentication token not provided.'));
+    }
 
-      const authenticatedSession = jwtService.verify(
-        jwtToken,
-      ) as AuthenticatedSessionDto;
+    const [method, token] = tokenPayload.split(' ');
+    if (method !== 'Bearer') {
+      return next(new Error('Invalid authentication method.'));
+    }
+
+    try {
+      const authenticatedSession = (await jwtService.verifyAsync(
+        token,
+      )) as AuthenticatedSessionDto;
 
       const authSocket = socket as AuthenticatedSocket;
       authSocket.user = authenticatedSession.profile;
 
       return next();
     } catch (error) {
-      next({
-        name: 'Unauthorizaed',
-        message: 'Failed to authenticated user.',
-      });
+      return next(new Error('Authentication fails.'));
     }
   };
 };

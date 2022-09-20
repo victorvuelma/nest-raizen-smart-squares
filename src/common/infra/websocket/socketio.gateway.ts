@@ -15,6 +15,7 @@ import {
   AuthenticatedSocket,
   AuthSocketMiddleware,
 } from '../../../features/auth/gateway/auth.middleware';
+import { ApiConfigService } from '../../api-config/api-config.service';
 
 @WebSocketGateway()
 export class SocketIoGateway
@@ -28,11 +29,15 @@ export class SocketIoGateway
 
   constructor(
     @Inject(CACHE_MANAGER) private _cache: Cache,
+    private _apiConfig: ApiConfigService,
     private _jwtService: JwtService,
   ) {}
 
   afterInit(server: Namespace) {
-    const authMiddleware = AuthSocketMiddleware(this._jwtService);
+    const authMiddleware = AuthSocketMiddleware(
+      this._jwtService,
+      this._apiConfig.environment == 'DEVELOPMENT',
+    );
     server.use(authMiddleware);
   }
 
