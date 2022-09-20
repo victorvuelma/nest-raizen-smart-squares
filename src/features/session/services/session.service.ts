@@ -113,25 +113,40 @@ export class SessionService {
     return sessionModel;
   }
 
-  async closeSession(data: Partial<CloseSessionDto>): Promise<SessionModel> {
-    const close = this._sessionValidator.validateClose(data);
-
-    const session = await this.get(close.sessionId);
+  async closeSession(
+    data: Partial<CloseSessionDto>,
+  ): Promise<SessionModel | null> {
+    const { sessionId, points } = this._sessionValidator.validateClose(data);
 
     const closedSession = await this._sessionRepository.update({
-      where: { id: session.id },
+      where: { id: sessionId },
       data: {
         status: SessionStatus.CLOSED,
-        points: close.points,
+        points: points,
         endAt: new Date(),
       },
     });
-    const sessionModel = this._sessionMapper.mapper.map(
-      closedSession,
-      SessionModel,
+
+    const detail = await this._sessionRepository.get({
+      id: sessionId,
+    });
+    if (!detail) {
+      return null;
+    }
+
+    const sessionDetail = {
+      ...closedSession,
+      cycles: sumBy(detail.activities, (a) => a.cycles),
+      potency: sumBy(detail.activities, (a) => a.potency as any as number),
+    };
+    const sessionDetailModel = this._sessionMapper.mapper.map(
+      sessionDetail,
+      SessionDetailModel,
     );
 
-    return sessionModel;
+    this._sessionGateway.notifySessionClose(sessionDetailModel);
+
+    return sessionDetailModel;
   }
 
   async findCustomerActiveSession(

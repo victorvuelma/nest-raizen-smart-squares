@@ -76,6 +76,16 @@ export class SessionGateway
     });
   }
 
+  async notifySessionClose(session: SessionDetailModel): Promise<void> {
+    const customerSocket = await this.getCustomerSocket(session.customerId);
+
+    customerSocket?.emit('session-close', {
+      cycles: session.cycles,
+      potency: session.potency,
+      points: session.points,
+    });
+  }
+
   private _customerKey(customerId: string) {
     return `customer_socket:${customerId}`;
   }
