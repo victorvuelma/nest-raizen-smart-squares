@@ -35,7 +35,7 @@ export class SessionController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('/')
-  @HttpCode(HttpStatus.GONE)
+  @HttpCode(HttpStatus.NO_CONTENT)
   endSession(@Request() req: FastifyRequest) {
     const user = req['user'] as AuthenticatedProfileDto;
 
