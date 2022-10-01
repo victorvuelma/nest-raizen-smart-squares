@@ -12,6 +12,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { CustomerModel } from './models/customer.model';
+import { PointsModel } from './models/points.model';
 import { CustomerService } from './services/customer.service';
 
 @Controller('customer')
@@ -31,5 +32,16 @@ export class CustomerController {
   @HttpCode(HttpStatus.OK)
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('points')
+  @HttpCode(HttpStatus.OK)
+  async getPoints(@Request() req): Promise<PointsModel> {
+    const customer = await this.customerService.get(req.user.id);
+
+    return {
+      points: customer.points,
+    };
   }
 }
