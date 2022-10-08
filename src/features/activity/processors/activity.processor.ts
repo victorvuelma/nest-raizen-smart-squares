@@ -1,5 +1,6 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
+import { job } from 'cron';
 
 import { QUEUES } from '../../../common/infra/queue/queues';
 import { SessionService } from '../../session/services/session.service';
@@ -19,7 +20,7 @@ export class ActivityQueueProcessor {
     const { when, ...data } = job.data;
 
     const activity = await this._activityService.save({
-      when: new Date(when),
+      when: new Date(),
       ...data,
     });
 
